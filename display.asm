@@ -101,38 +101,133 @@ clear_more:     SET B, [active_display]
 ; Read a line of characters
 ; =========================================================
 .proc
-read_line:      SET PUSH, I
+read_line:      SET PUSH, Z                 ; Insert mode?
+                SET PUSH, Y                 ; Cursor location
+                SET PUSH, X                 ; End of string location
+                SET PUSH, I
+                SET PUSH, J
                 JSR clear_keys
+
+                SET Z, 0
                 SET B, [active_display]
-                SET I, [B+SCR_CURSOR]
-_read_loop:     IFE I, [B+SCR_END]          ; Don't draw past screen
-                    JMP _no_cursor
-                SET [I], 0xE080             ; Draw cursor
-                BOR [I], 0x12
-_no_cursor:     JSR read_key
-                IFE A, 0x10                 ; Backspace pressed
-                IFN I, [B+SCR_CURSOR]       ; We have keys pressed
-                    JMP _backspace
-                IFE A, 0x11                 ; Return keyboard buffer
+                SET Y, [B+SCR_CURSOR]
+                SET X, Y
+
+_read_loop:     JSR _draw_cursor
+                JSR read_key
+
+                ; --- Clear cursor ----------
+                IFN Y, X
+                    AND [Y], 0xFF
+                IFE Y, X
+                    SET [Y], ' '
+                BOR [Y], [B+SCR_COLOR]
+                
+                IFE A, 0x10                 ; Backspace
+                    JMP _backspace_key
+                IFE A, 0x11                 ; Return
                     JMP _return
-                IFL I, [B+SCR_END]          ; Characters left
-                IFG A, 0x1F                 ; Inside ascii range
-                IFL A, 0x80
-                    JMP _ascii
+                IFE A, 0x12                 ; Insert
+                    JMP _insert_key
+                IFE A, 0x13                 ; Delete
+                    JMP _delete_key
+                IFE A, 0x82                 ; Left
+                    JMP _left_key
+                IFE A, 0x83                 ; Right
+                    JMP _right_key
+                IFG A, 0x7F                 ; Not-ascii
+                    JMP _read_loop
+                
+                IFL Y, X                    ; Cursor mid-string
+                IFE Z, 0                    ; Insert mode
+                    JSR _shift_forward
+
+                SET [Y], A
+                BOR [Y], [B+SCR_COLOR]
+                SET A, [B+SCR_END]
+                SUB A, 1
+
+                ADD Y, 1
+                IFG Y, X
+                    SET X, Y
+
+                ; Clamp values to prevent writting outside of display
+                SET A, [B+SCR_END]
+                IFG X, A
+                    SET X, A
+                SUB A, 1
+                IFG Y, A
+                    SET Y, A
                 JMP _read_loop
-_ascii:         SET [I], A
-                BOR [I], [B+SCR_COLOR]
-                ADD I, 1
-                JMP _read_loop
-_backspace:     SET [I], [B+SCR_COLOR]
-                BOR [I], ' '
+                
+
+_shift_forward: SET I, X
+                IFE I, [B+SCR_END]
+                    SUB I, 1
+_sf_loop:       IFE I, Y
+                    JMP _sf_return
+                SET [I], [I-1]
                 SUB I, 1
-                JMP _read_loop
-_return:        ; TODO: string buffer?
-                SET [I], [B+SCR_COLOR]
-                BOR [I], ' '
-                SET I, POP
+                JMP _sf_loop
+_sf_return:     ADD X, 1
                 RET
+
+_shift_back:    SET I, Y
+_sb_loop:       IFE I, X
+                    JMP _sb_return
+                SET [I], [I+1]
+                ADD I, 1
+                JMP _sb_loop
+_sb_return:     SUB X, 1
+                SET [X], ' '
+                BOR [X], [B+SCR_COLOR]
+                RET
+
+_backspace_key: IFE Y, [B+SCR_CURSOR]
+                    JMP _read_loop
+                SUB Y, 1                    ; Delete previous character
+                JSR _shift_back
+                JMP _read_loop
+_delete_key:    IFE Y, X
+                    JMP _read_loop
+                JSR _shift_back             ; Delete character ahead of cursor
+                JMP _read_loop
+                
+_insert_key:    XOR Z, 1                    ; Toggle insert mode
+                JMP _read_loop
+
+_left_key:      IFG Y, [B+SCR_CURSOR]
+                    SUB Y, 1
+                JMP _read_loop
+                
+_right_key:     IFL Y, X
+                    ADD Y, 1
+                JMP _read_loop
+
+_return:        SET J, POP
+                SET I, POP
+                SET X, POP
+                SET Y, POP
+                SET Z, POP
+                RET
+
+
+_draw_cursor:   IFE Y, X
+                   JMP _draw_end
+                AND [Y], 0xFF
+                IFE Z, 0
+                    BOR [Y], 0xF800
+                IFN Z, 0
+                    BOR [Y], 0x0F00
+                RET
+_draw_end:      SET [Y], [B+SCR_COLOR]
+                IFE Z, 0
+                    BOR [Y], '_' | 0x80     ; Blinking cursor
+                IFN Z, 0
+                    BOR [Y], 0x9C
+                RET
+
+
 .endproc
 
 ; =========================================================

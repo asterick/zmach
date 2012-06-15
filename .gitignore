@@ -1,4 +1,5 @@
 # Ignore all the crap 
+.DS_Store
 stories
 build
 out
