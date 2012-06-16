@@ -19,6 +19,7 @@ even_flag:      .data 0             ; Non-zero when reading on an odd boundary
 output_stream:  .data print_char    ; Default to screen
 
 ; =========================================================
+; Output packed ZSCII string
 ; =========================================================
 .proc
 _alpha_dict0:    .data "abcdefghijklmnopqrstuvwxyz"

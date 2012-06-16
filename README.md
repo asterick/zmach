@@ -18,7 +18,6 @@ Current implemented features
 
 Current task list
 -----------------
-* Input handler needs to encode to zscii and clear itself.
 * Input tokenizer
 * Interpreter core (started, incomplete)
 
