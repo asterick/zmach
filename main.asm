@@ -29,16 +29,6 @@ entry:          SET A, 1
                 JSR set_display
                 JSR clear_display
 
-                SET I, randomdata
-loop:           SET A, [I]
-                ADD I, 1
-                IFE A, 0
-                    JMP break
-                JSR print_char
-                jmp loop
-randomdata:     .data "This is a hello world test.\r>", 0
-break:
-
                 JSR read_line
 crash:          JMP crash
 
