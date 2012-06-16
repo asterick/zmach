@@ -18,6 +18,10 @@
         SET PC, data
 .endmacro
 
+.macro NOP
+        SET A, A
+.endmacro
+
 .macro DEC_IJ
         STD A, A
 .endmacro

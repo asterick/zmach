@@ -18,11 +18,14 @@ Current implemented features
 
 Current task list
 -----------------
-* Interpreter core (started, incomplete)
-* Input tokenizer
+* Interpreter core
+    * Instruction decode finish
+    * Actual instructions not executed
+    * Input tokenizer missing
 
 Things to be added in the future
 --------------------------------
 * Loading and Saving to disk (stories, saves)
 * Additional non keyboard and screen streams (1+)
 * Sound support
+
