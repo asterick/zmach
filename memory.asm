@@ -27,17 +27,17 @@ _alpha_dict1:    .data "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 _alpha_dict2:    .data " \r0123456789.,!?_#'\"/\\-:()"
 _alphabet:       .data _alpha_dict0
 
-print_paddr:    SET PUSH, [current_pc]
-                SET PUSH, [even_flag]
+print_paddr:    PUSH [current_pc]
+                PUSH [even_flag]
                 JSR set_pc_paddr
                 JSR print_zstring
-                SET [even_flag], POP
-                SET [current_pc], POP
+                POP [even_flag]
+                POP [current_pc]
                 RET
 
-print_zstring:  SET PUSH, X ; Shifter
-                SET PUSH, Y ; Break bit
-                SET PUSH, Z ; ZSCII remaining
+print_zstring:  PUSH X ; Shifter
+                PUSH Y ; Break bit
+                PUSH Z ; ZSCII remaining
                 SET [_alphabet], _alpha_dict0
 
                 JSR _next_zscii         ; Read first ZSCII char
@@ -69,9 +69,9 @@ _next_step:     JSR _read_zscii
 _zscii_full:    JSR _read_zscii
                 SET A, EX
                 SHL A, 5
-                SET PUSH, A
+                PUSH A
                 JSR _read_zscii
-                SET A, POP
+                POP A
                 BOR A, EX
                 JSR print_char
                 JMP _reset_step
@@ -107,10 +107,10 @@ _shift_out:     SUB Z, 1
                 SHL X, 5            ; EX = next zscii char
                 RET
 
-_zscii_done:    SET X, POP  ; Strip off the last PC
-                SET Z, POP
-                SET Y, POP
-                SET X, POP
+_zscii_done:    POP X               ; Strip off the last PC
+                POP Z
+                POP Y
+                POP X
                 RET
 .endproc
 

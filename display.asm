@@ -75,7 +75,7 @@ set_color:      SET I, [active_display]
 ; Clear active display
 ; =========================================================
 .proc
-clear_display:  SET PUSH, I
+clear_display:  PUSH I
                 SET C, [active_display]
                 SET B, [C+SCR_START]
                 SET [C+SCR_LINES_FED], 0
@@ -86,7 +86,7 @@ _clear_loop:    SET [B], I
                 ADD B, 1
                 IFL B, [C+SCR_END]
                     SET PC, _clear_loop
-                SET I, POP
+                POP I
                 RET
 .endproc
 
@@ -101,11 +101,11 @@ clear_more:     SET B, [active_display]
 ; Read a line of characters
 ; =========================================================
 .proc
-read_line:      SET PUSH, Z                 ; Insert mode?
-                SET PUSH, Y                 ; Cursor location
-                SET PUSH, X                 ; End of string location
-                SET PUSH, I
-                SET PUSH, J
+read_line:      PUSH Z                      ; Insert mode?
+                PUSH Y                      ; Cursor location
+                PUSH X                      ; End of string location
+                PUSH I
+                PUSH J
                 JSR clear_keys
 
                 SET Z, 0
@@ -204,11 +204,11 @@ _right_key:     IFL Y, X
                     ADD Y, 1
                 JMP _read_loop
 
-_return:        SET J, POP
-                SET I, POP
-                SET X, POP
-                SET Y, POP
-                SET Z, POP
+_return:        POP J
+                POP I
+                POP X
+                POP Y
+                POP Z
                 RET
 
 
@@ -243,8 +243,8 @@ print_num:      IFA A, -1
                 SET A, C
                 MLI A, -1
 
-print_unum:     SET PUSH, X
-                SET PUSH, Y
+print_unum:     PUSH X
+                PUSH Y
                 SET Y, A
                 SET X, 10000
 _pn_size:       IFE X, Y
@@ -262,8 +262,8 @@ _pn_loop:       SET A, Y
                 DIV X, 10
                 IFN X, 0
                     JMP _pn_loop
-                SET Y, POP
-                SET X, POP
+                POP Y
+                POP X
                 RET
 .endproc
 
@@ -272,8 +272,8 @@ _pn_loop:       SET A, Y
 ; =========================================================
 .proc
 _more_prompt:   .data "[more]", 0
-print_char:     SET PUSH, J
-                SET PUSH, I
+print_char:     PUSH J
+                PUSH I
                 SET C, [active_display]
                 JSR _check_scroll           ; Do We need to scroll our text?
                 IFN A, '\r'                 ; Carriage return (line break)
@@ -322,8 +322,8 @@ _copy_char:     SET B, [C+SCR_CURSOR]
                 SET [B-1], A
                 SET [C+SCR_CURSOR], B
                 SUB [C+SCR_REM_CHAR], 1
-_printc_ret:    SET I, POP
-                SET J, POP
+_printc_ret:    POP I
+                POP J
                 RET
 
 _check_scroll:  IFL [C+SCR_CURSOR], [C+SCR_END] ; In current display
@@ -355,11 +355,11 @@ _hold_loop:     STI [I], [J]
                 BOR [I-1], 0x80
                 IFN [J], 0
                     JMP _hold_loop
-                SET PUSH, A
-                SET PUSH, C
+                PUSH A
+                PUSH C
                 JSR clear_keys
                 JSR read_key
-                SET C, POP
-                SET A, POP
+                POP C
+                POP A
                 RET
 .endproc

@@ -169,18 +169,18 @@ _short_op:      SET A, X
 ; Preserve z-machine call frame, and restore with call
 ; =========================================================
 .proc
-zm_call:        SET PUSH, B
-                SET PUSH, C
-                SET PUSH, [current_pc]
-                SET PUSH, [even_flag]
-                SET PUSH, [local_var]
-                SET PUSH, [data_stack]
+zm_call:        PUSH B
+                PUSH C
+                PUSH [current_pc]
+                PUSH [even_flag]
+                PUSH [local_var]
+                PUSH [data_stack]
                 JSR A
-                SET [data_stack], POP
-                SET [local_var], POP
-                SET [even_flag], POP
-                SET [current_pc], POP
-                SET C, POP
-                SET B, POP
+                POP [data_stack]
+                POP [local_var]
+                POP [even_flag]
+                POP [current_pc]
+                POP C
+                POP B
                 RET
 .endproc
