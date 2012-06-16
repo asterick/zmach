@@ -18,7 +18,7 @@ story_data:     .incbig "stories/ZORK1.DAT"
 ; Post initialization main function
 ; =========================================================
 
-entry:          SET A, 1
+reset:          SET A, 1
                 JSR set_border
 
                 SET A, display_status
@@ -29,7 +29,7 @@ entry:          SET A, 1
                 JSR set_display
                 JSR clear_display
 
-                JSR zm_reset
-crash:          JMP crash
+                JSR mach_start
+                JMP reset
 
 bss_section:    

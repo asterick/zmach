@@ -18,8 +18,8 @@ Current implemented features
 
 Current task list
 -----------------
-* Input tokenizer
 * Interpreter core (started, incomplete)
+* Input tokenizer
 
 Things to be added in the future
 --------------------------------

@@ -2,10 +2,10 @@
 ; CRT0 startup code
 ; =========================================================
 .proc
-reset:          SET SP, 0
+                SET SP, 0
                 HWN I
 _init_loop:     IFE I, 0
-                    JMP entry
+                    JMP reset
                 SUB I, 1
                 HWQ I
 
