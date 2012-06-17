@@ -19,7 +19,7 @@ Current implemented features
 Current task list
 -----------------
 * Interpreter core
-    * Instruction decode finish
+    * Instruction decode finished
     * Actual instructions not executed
     * Input tokenizer missing
 
