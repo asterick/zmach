@@ -29,6 +29,7 @@ reset:          SET A, 1
                 JSR set_display
                 JSR clear_display
 
+                BRK
                 JSR mach_start
                 JMP reset
 

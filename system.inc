@@ -7,7 +7,7 @@
 .endmacro
 
 .macro BRK
-        .DATA 0x0040    ; Breakpoint for 0x10co.de
+        .data 0x0040    ; Breakpoint for 0x10co.de
 .endmacro
 
 .macro RET
