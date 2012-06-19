@@ -22,7 +22,6 @@
 .equ SCR_WRAP       2   ; Allow word wrap
 .equ SCR_MORE       4   ; Prompt when scrolling too much
 
-lem_device:         .data 0xFFFF
 active_display:     .data display_status
 
 display_status:     .data lem_display

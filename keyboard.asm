@@ -1,4 +1,3 @@
-key_device:     .data   0xFFFF      ; Keep device private
 
 ; =========================================================
 ; Keyboard device

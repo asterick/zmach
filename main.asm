@@ -1,7 +1,16 @@
 .include        "system.inc"        ; macros for ease of use
 
+; Global definition table
 .org            bss_section
+local_var:      .bss 1
+data_stack:     .bss 1
+return_value:   .bss 1
+inst_argc:      .bss 1
+inst_argv:      .bss 4
+key_device:     .bss 1
+lem_device:     .bss 1
 lem_display:    .bss 0x180          ; Frame buffer
+
 heap:                               ; Unused heap space
 
 .org            0x0000
@@ -29,7 +38,6 @@ reset:          SET A, 1
                 JSR set_display
                 JSR clear_display
 
-                BRK
                 JSR mach_start
                 JMP reset
 
