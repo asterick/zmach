@@ -34,7 +34,7 @@ _var_inst:      .data 0, 1, 2, 3
                 .data 0, 1, 2, 3
 
 mach_start:     SET [local_var], heap           ; Reset to top of stack
-                SET [data_stack], heap + 15     ; Allocate 15 local variables
+                SET [data_stack], heap          ; Entry point has no locals
                 SET A, [STORY_INIT_PC]          ; Jump to start PC
                 JSR set_pc_addr
 
