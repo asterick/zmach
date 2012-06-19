@@ -81,7 +81,7 @@ _0op_inst:      .data 0             ; 0x00
                 .data 0             ; 0x01
                 .data zm_print      ; 0x02
                 .data zm_printret   ; 0x03
-                .data 0             ; 0x04
+                .data step_mach     ; 0x04
                 .data 0             ; 0x05
                 .data 0             ; 0x06
                 .data 0             ; 0x07
@@ -146,8 +146,8 @@ _var_inst:      .data zm_call       ; 0x00
                 .data zm_storeb     ; 0x02
                 .data 0             ; 0x03
                 .data 0             ; 0x04
-                .data 0             ; 0x05
-                .data 0             ; 0x06
+                .data zm_printchar  ; 0x05
+                .data zm_printnum   ; 0x06
                 .data 0             ; 0x07
                 .data 0             ; 0x08
                 .data 0             ; 0x09
@@ -318,6 +318,23 @@ zm_print:       JSR print_addr
 zm_printret:    JSR print_addr
                 SET [return_value], 1   ; Return true
                 RET
+.endproc
+
+.proc
+zm_printchar:   SET A, [inst_argv]
+                IFN A, '\r'
+                IFL A, 0x20
+                    JMP step_mach
+                IFL A, 0x80             ; Print only ascii characters
+                    JSR print_char
+                JMP step_mach
+
+.endproc
+
+.proc
+zm_printnum:    SET A, [inst_argv]
+                JSR print_num
+                JMP step_mach
 .endproc
 
 ; =========================================================
