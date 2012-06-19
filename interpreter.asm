@@ -87,7 +87,7 @@ _0op_inst:      .data zm_rtrue      ; 0x00
                 .data 0             ; 0x07 * Will not implement
                 .data zm_retpop     ; 0x08
                 .data zm_voidpop    ; 0x09
-                .data 0             ; 0x0A * Will not implement
+                .data zm_quit       ; 0x0A
                 .data zm_newline    ; 0x0B
                 .data 0             ; 0x0C
                 .data 0             ; 0x0D
@@ -215,6 +215,10 @@ _call_start:    JSR step_mach
                 POP C
                 POP B
                 JMP step_mach
+.endproc
+
+.proc
+zm_quit:        JMP zm_quit
 .endproc
 
 .proc
