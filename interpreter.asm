@@ -7,31 +7,6 @@
 ; =========================================================
 
 .proc
-; --- Instruction lookup tables
-_0op_inst:      .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
-_1op_inst:      .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
-_2op_inst:      .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
-_var_inst:      .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
-                .data 0, 1, 2, 3
 
 mach_start:     SET [local_var], heap           ; Reset to top of stack
                 SET [data_stack], heap          ; Entry point has no locals
@@ -97,9 +72,22 @@ _short_op:      SET A, X
                 JSR _var_map
                 AND X, 0xF
                 IFE [inst_argc], 0
-                    m [_0op_inst+X]
+                    JMP [_0op_inst+X]
                 JMP [_1op_inst+X]
 
+; --- Jump tables --------------------------
+_0op_inst:      .data 0, 0, 0, 0, 0, 0, 0, 0
+                .data 0, 0, 0, 0, 0, 0, 0, 0
+_1op_inst:      .data 0, 0, 0, 0, 0, 0, 0, 0
+                .data 0, 0, 0, 0, 0, 0, 0, 0
+_2op_inst:      .data 0, 0, 0, 0, 0, 0, 0, 0
+                .data 0, 0, 0, 0, 0, 0, 0, 0
+                .data 0, 0, 0, 0, 0, 0, 0, 0
+                .data 0, 0, 0, 0, 0, 0, 0, 0
+_var_inst:      .data zm_call, 0, 0, 0, 0, 0, 0, 0
+                .data 0, 0, 0, 0, 0, 0, 0, 0
+                .data 0, 0, 0, 0, 0, 0, 0, 0
+                .data 0, 0, 0, 0, 0, 0, 0, 0
 
 
 .endproc
@@ -114,14 +102,32 @@ zm_call:        PUSH B
                 PUSH [even_flag]
                 PUSH [local_var]
                 PUSH [data_stack]
-                JSR A
+                
+                SET A, [inst_argv]  ; Argument 0 is always the routine
+                JSR set_pc_paddr    ; Jump to the packed address
+
+                JSR read_b_pc                   ; Get local argument count
+
+                SET J, [data_stack]             ; Shift call frame (allocate A locals)
+                SET [local_var], J
+                ADD [data_stack], A
+
+                SET I, [inst_argc]              ; Current argument count
+                SUB I, 1                        ; Last argument index
+                ADD J, I                        ; J = locals[I]
+_arg_loop:      IFA I, 0                        ; Copy down (ignore routine address)
+                    JMP _call_start
+                STD [J-1], [inst_argv+I]        ; J is one too high
+                JMP _arg_loop
+
+_call_start:    JSR step_mach
                 POP [data_stack]
                 POP [local_var]
                 POP [even_flag]
                 POP [current_pc]
                 POP C
                 POP B
-                RET
+                JMP step_mach
 .endproc
 
 ; =========================================================
