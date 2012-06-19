@@ -82,9 +82,9 @@ _1op_inst:      .data 0, 0, 0, 0, 0, 0, 0, 0
                 .data 0, 0, 0, 0, 0, 0, 0, 0
 _2op_inst:      .data 0, 0, 0, 0, 0, 0, 0, 0
                 .data 0, 0, 0, 0, 0, 0, 0, 0
-                .data 0, 0, 0, 0, 0, 0, 0, 0
-                .data 0, 0, 0, 0, 0, 0, 0, 0
-_var_inst:      .data zm_call, 0, 0, 0, 0, 0, 0, 0
+                .data 0, 0, 0, 0, zm_add, zm_sub, zm_mul, zm_div
+                .data zm_mod, 0, 0, 0, 0, 0, 0, 0
+_var_inst:      .data zm_call, zm_storew, zm_storeb, 0, 0, 0, 0, 0
                 .data 0, 0, 0, 0, 0, 0, 0, 0
                 .data 0, 0, 0, 0, 0, 0, 0, 0
                 .data 0, 0, 0, 0, 0, 0, 0, 0
@@ -129,6 +129,63 @@ _call_start:    JSR step_mach
                 POP [current_pc]
                 POP C
                 POP B
+                JMP step_mach
+.endproc
+
+.proc
+zm_add:         JSR read_b_pc
+                SET B, [inst_argv]
+                ADD B, [inst_argv+1]
+                JSR write_var
+                JMP step_mach
+.endproc
+
+.proc
+zm_sub:         JSR read_b_pc
+                SET B, [inst_argv]
+                SUB B, [inst_argv+1]
+                JSR write_var
+                JMP step_mach
+.endproc
+
+.proc
+zm_mul:         JSR read_b_pc
+                SET B, [inst_argv]
+                MLI B, [inst_argv+1]
+                JSR write_var
+                JMP step_mach
+.endproc
+
+.proc
+zm_div:         JSR read_b_pc
+                SET B, [inst_argv]
+                DVI B, [inst_argv+1]
+                JSR write_var
+                JMP step_mach
+.endproc
+
+.proc
+zm_mod:         JSR read_b_pc
+                SET B, [inst_argv]
+                MDI B, [inst_argv+1]
+                JSR write_var
+                JMP step_mach
+.endproc
+
+.proc
+zm_storew:      SET A, [inst_argv+1]
+                SHL A, 1
+                ADD A, [inst_argv]
+                SET B, [inst_argv+2]
+                JSR write_w_addr
+                JMP step_mach
+.endproc
+
+.proc
+zm_storeb:      SET A, [inst_argv+1]
+                ADD A, [inst_argv]
+                SET B, [inst_argv+2]
+                JSR write_b_addr
                 JMP step_mach
 .endproc
 
