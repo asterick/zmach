@@ -15,12 +15,12 @@ Current implemented features
 * Advanced multi-window display with support for scrolling, scroll lock and word wrap
 * Configurable color output
 * ZSCII output
+* Preliminary z-machine runtime
 
 Current task list
 -----------------
 * Interpreter core
-    * Instruction decode finished
-    * Actual instructions not executed
+    * Current instruction coverage: 34 of 69 implemented
     * Input tokenizer missing
 
 Things to be added in the future
