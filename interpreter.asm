@@ -98,18 +98,18 @@ _1op_inst:      .data 0             ; 0x00
                 .data 0             ; 0x02
                 .data 0             ; 0x03
                 .data 0             ; 0x04
-                .data 0             ; 0x05
-                .data 0             ; 0x06
+                .data zm_inc        ; 0x05
+                .data zm_dec        ; 0x06
                 .data zm_printaddr  ; 0x07
                 .data zm_call       ; 0x08
                 .data 0             ; 0x09
                 .data 0             ; 0x0A
-                .data 0             ; 0x0B
+                .data zm_ret        ; 0x0B
                 .data 0             ; 0x0C
                 .data zm_printpaddr ; 0x0D
-                .data 0             ; 0x0E
-                .data 0             ; 0x0F
-_2op_inst:      .data 0             ; 0x00
+                .data zm_load       ; 0x0E
+                .data zm_not        ; 0x0F
+_2op_inst:      .data illegal       ; 0x00
                 .data 0             ; 0x01
                 .data 0             ; 0x02
                 .data 0             ; 0x03
@@ -117,12 +117,12 @@ _2op_inst:      .data 0             ; 0x00
                 .data 0             ; 0x05
                 .data 0             ; 0x06
                 .data 0             ; 0x07
-                .data 0             ; 0x08
-                .data 0             ; 0x09
+                .data zm_or         ; 0x08
+                .data zm_and        ; 0x09
                 .data 0             ; 0x0A
                 .data 0             ; 0x0B
                 .data 0             ; 0x0C
-                .data 0             ; 0x0D
+                .data zm_store      ; 0x0D
                 .data 0             ; 0x0E
                 .data zm_loadw      ; 0x0F
                 .data zm_loadb      ; 0x10
@@ -214,6 +214,67 @@ _call_start:    JSR step_mach
                 POP [current_pc]
                 POP C
                 POP B
+                JMP step_mach
+.endproc
+
+.proc
+zm_not:         JSR read_b_pc
+                SET B, [inst_argv]
+                XOR B, 0xFFFF
+                JSR write_var
+                JMP step_mach
+.endproc
+
+.proc
+zm_and:         JSR read_b_pc
+                SET B, [inst_argv]
+                AND B, [inst_argv+1]
+                JSR write_var
+                JMP step_mach
+.endproc
+
+.proc
+zm_or:          JSR read_b_pc
+                SET B, [inst_argv]
+                BOR B, [inst_argv+1]
+                JSR write_var
+                JMP step_mach
+.endproc
+
+.proc
+zm_inc:         SET A, [inst_argv]
+                JSR read_var
+                SET B, A
+                ADD B, 1
+                SET A, [inst_argv]
+                JSR write_var
+                JMP step_mach
+.endproc
+
+.proc
+zm_dec:         SET A, [inst_argv]
+                JSR read_var
+                SET B, A
+                SUB B, 1
+                SET A, [inst_argv]
+                JSR write_var
+                JMP step_mach
+.endproc
+
+.proc
+zm_load:        SET A, [inst_argv]
+                JSR read_var
+                SET X, A
+                JSR read_b_pc
+                SET B, X
+                JSR write_var
+                JMP step_mach
+.endproc
+
+.proc
+zm_store:       SET A, [inst_argv]
+                SET B, [inst_argv+1]
+                JSR write_var
                 JMP step_mach
 .endproc
 
@@ -317,6 +378,11 @@ zm_print:       JSR print_addr
 .proc
 zm_printret:    JSR print_addr
                 SET [return_value], 1   ; Return true
+                RET
+.endproc
+
+.proc
+zm_ret:         SET [return_value], [inst_argv]
                 RET
 .endproc
 
