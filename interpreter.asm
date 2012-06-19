@@ -153,13 +153,13 @@ _var_inst:      .data zm_call       ; 0x00
                 .data 0             ; 0x09
                 .data 0             ; 0x0A
                 .data 0             ; 0x0B
-                .data 0             ; 0x0C
-                .data 0             ; 0x0D
-                .data 0             ; 0x0E
-                .data 0             ; 0x0F
-                .data 0             ; 0x10
-                .data 0             ; 0x11
-                .data 0             ; 0x12
+                .data illegal       ; 0x0C
+                .data illegal       ; 0x0D
+                .data illegal       ; 0x0E
+                .data illegal       ; 0x0F
+                .data illegal       ; 0x10
+                .data illegal       ; 0x11
+                .data illegal       ; 0x12
                 .data 0             ; 0x13
                 .data 0             ; 0x14
                 .data 0             ; 0x15
