@@ -9,6 +9,9 @@ drive standard, it will be very likely that I will support loading
 and saving from disk, as well as loading alternate stories rather
 than doing a static compile.
 
+Due to the self destructive nature of z-machine stories, resetting, loading
+and saving cannot be supported until disks are supported.
+
 Current implemented features
 ----------------------------
 * Optimized byte index-addressing
