@@ -76,18 +76,102 @@ _short_op:      SET A, X
                 JMP [_1op_inst+X]
 
 ; --- Jump tables --------------------------
-_0op_inst:      .data 0, 0, 0, 0, 0, 0, 0, 0
-                .data 0, 0, 0, 0, 0, 0, 0, 0
-_1op_inst:      .data 0, 0, 0, 0, 0, 0, 0, 0
-                .data 0, 0, 0, 0, 0, 0, 0, 0
-_2op_inst:      .data 0, 0, 0, 0, 0, 0, 0, 0
-                .data 0, 0, 0, 0, 0, 0, 0, 0
-                .data 0, 0, 0, 0, zm_add, zm_sub, zm_mul, zm_div
-                .data zm_mod, 0, 0, 0, 0, 0, 0, 0
-_var_inst:      .data zm_call, zm_storew, zm_storeb, 0, 0, 0, 0, 0
-                .data 0, 0, 0, 0, 0, 0, 0, 0
-                .data 0, 0, 0, 0, 0, 0, 0, 0
-                .data 0, 0, 0, 0, 0, 0, 0, 0
+_0op_inst:      .data 0             ; 0x00
+                .data 0             ; 0x01
+                .data 0             ; 0x02
+                .data 0             ; 0x03
+                .data 0             ; 0x04
+                .data 0             ; 0x05
+                .data 0             ; 0x06
+                .data 0             ; 0x07
+                .data 0             ; 0x08
+                .data 0             ; 0x09
+                .data 0             ; 0x0A
+                .data 0             ; 0x0B
+                .data 0             ; 0x0C
+                .data 0             ; 0x0D
+                .data 0             ; 0x0E *
+                .data 0             ; 0x0F *
+_1op_inst:      .data 0             ; 0x00
+                .data 0             ; 0x01
+                .data 0             ; 0x02
+                .data 0             ; 0x03
+                .data 0             ; 0x04
+                .data 0             ; 0x05
+                .data 0             ; 0x06
+                .data 0             ; 0x07
+                .data zm_call       ; 0x08
+                .data 0             ; 0x09
+                .data 0             ; 0x0A
+                .data 0             ; 0x0B
+                .data 0             ; 0x0C
+                .data 0             ; 0x0D
+                .data 0             ; 0x0E
+                .data 0             ; 0x0F
+_2op_inst:      .data 0             ; 0x00
+                .data 0             ; 0x01
+                .data 0             ; 0x02
+                .data 0             ; 0x03
+                .data 0             ; 0x04
+                .data 0             ; 0x05
+                .data 0             ; 0x06
+                .data 0             ; 0x07
+                .data 0             ; 0x08
+                .data 0             ; 0x09
+                .data 0             ; 0x0A
+                .data 0             ; 0x0B
+                .data 0             ; 0x0C
+                .data 0             ; 0x0D
+                .data 0             ; 0x0E
+                .data zm_loadw      ; 0x0F
+                .data zm_loadb      ; 0x10
+                .data 0             ; 0x11
+                .data 0             ; 0x12
+                .data 0             ; 0x13
+                .data zm_add        ; 0x14
+                .data zm_sub        ; 0x15
+                .data zm_mul        ; 0x16
+                .data zm_div        ; 0x17
+                .data zm_mod        ; 0x18
+                .data 0             ; 0x19 *
+                .data 0             ; 0x1A *
+                .data 0             ; 0x1B *
+                .data 0             ; 0x1C *
+                .data 0             ; 0x1D *
+                .data 0             ; 0x1E *
+                .data 0             ; 0x1F *
+_var_inst:      .data zm_call       ; 0x00
+                .data zm_storew     ; 0x01
+                .data zm_storeb     ; 0x02
+                .data 0             ; 0x03
+                .data 0             ; 0x04
+                .data 0             ; 0x05
+                .data 0             ; 0x06
+                .data 0             ; 0x07
+                .data 0             ; 0x08
+                .data 0             ; 0x09
+                .data 0             ; 0x0A
+                .data 0             ; 0x0B
+                .data 0             ; 0x0C
+                .data 0             ; 0x0D
+                .data 0             ; 0x0E
+                .data 0             ; 0x0F
+                .data 0             ; 0x10
+                .data 0             ; 0x11
+                .data 0             ; 0x12
+                .data 0             ; 0x13
+                .data 0             ; 0x14
+                .data 0             ; 0x15
+                .data 0             ; 0x16 *
+                .data 0             ; 0x17 *
+                .data 0             ; 0x18 *
+                .data 0             ; 0x19 *
+                .data 0             ; 0x1A *
+                .data 0             ; 0x1B *
+                .data 0             ; 0x1C *
+                .data 0             ; 0x1D *
+                .data 0             ; 0x1E *
+                .data 0             ; 0x1F *
 
 
 .endproc
@@ -168,6 +252,29 @@ zm_div:         JSR read_b_pc
 zm_mod:         JSR read_b_pc
                 SET B, [inst_argv]
                 MDI B, [inst_argv+1]
+                JSR write_var
+                JMP step_mach
+.endproc
+
+.proc
+zm_loadw:       SET A, [inst_argv+1]
+                SHL A, 1
+                ADD A, [inst_argv]
+                JSR read_w_addr         ; A = Word
+                SET X, A
+                JSR read_b_pc
+                SET B, X
+                JSR write_var
+                JMP step_mach
+.endproc
+
+.proc
+zm_loadb:       SET A, [inst_argv+1]
+                ADD A, [inst_argv]
+                JSR read_b_addr         ; A = Byte
+                SET X, A
+                JSR read_b_pc
+                SET B, X
                 JSR write_var
                 JMP step_mach
 .endproc
