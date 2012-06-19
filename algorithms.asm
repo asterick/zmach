@@ -16,5 +16,10 @@ get_random: SET A, [_seed]
             XOR A, C
             RET
 
+seed_random:
+            SET [_seed], A
+            SET [_seed+1], 0xFACE
+            RET
+
 _seed:     .data 0xDEAD, 0xFACE
 .endproc

@@ -148,9 +148,9 @@ _var_inst:      .data zm_call       ; 0x00
                 .data 0             ; 0x04
                 .data zm_printchar  ; 0x05
                 .data zm_printnum   ; 0x06
-                .data 0             ; 0x07
-                .data 0             ; 0x08
-                .data 0             ; 0x09
+                .data zm_random     ; 0x07
+                .data zm_push       ; 0x08
+                .data zm_pop        ; 0x09
                 .data 0             ; 0x0A
                 .data 0             ; 0x0B
                 .data illegal       ; 0x0C
@@ -214,6 +214,42 @@ _call_start:    JSR step_mach
                 POP [current_pc]
                 POP C
                 POP B
+                JMP step_mach
+.endproc
+
+.proc
+zm_push:        SET B, [inst_argv]
+                SET A, 0
+                JSR write_var
+                JMP step_mach
+.endproc
+
+.proc
+zm_pop          SET A, 0
+                JSR read_var
+                SET B, A
+                SET A, [inst_argv]
+                JSR write_var
+                JMP step_mach
+.endproc
+
+.proc
+zm_random:      SET A, [inst_argv]
+                IFB A, 1
+                    JMP _random_seed
+                JSR get_random
+                MOD A, [inst_argv]
+                ADD A, 1
+                SET X, A
+                JSR read_b_pc
+                SET B, X
+                JSR write_var
+                JMP step_mach
+
+_random_seed:   JSR seed_random
+                JSR read_b_pc
+                SET B, 0
+                JSR write_var
                 JMP step_mach
 .endproc
 
