@@ -77,16 +77,16 @@ _short_op:      SET A, X
 
 ; --- Jump tables --------------------------
 .equ illegal 0
-_0op_inst:      .data 0             ; 0x00
-                .data 0             ; 0x01
+_0op_inst:      .data zm_rtrue      ; 0x00
+                .data zm_rfalse     ; 0x01
                 .data zm_print      ; 0x02
                 .data zm_printret   ; 0x03
                 .data step_mach     ; 0x04
                 .data 0             ; 0x05
                 .data 0             ; 0x06
                 .data 0             ; 0x07
-                .data 0             ; 0x08
-                .data 0             ; 0x09
+                .data zm_retpop     ; 0x08
+                .data zm_voidpop    ; 0x09
                 .data 0             ; 0x0A
                 .data 0             ; 0x0B
                 .data 0             ; 0x0C
@@ -218,6 +218,29 @@ _call_start:    JSR step_mach
 .endproc
 
 .proc
+zm_retpop:      SET A, 0
+                JSR read_var
+                SET [return_value], A
+                RET
+.endproc
+
+.proc
+zm_voidpop:     SET A, 0
+                JSR read_var
+                JMP step_mach
+.endproc
+
+.proc
+zm_rfalse:      SET [return_value], 0
+                RET
+.endproc
+
+.proc
+zm_rtrue:       SET [return_value], 1
+                RET
+.endproc
+
+.proc
 zm_push:        SET B, [inst_argv]
                 SET A, 0
                 JSR write_var
@@ -225,7 +248,7 @@ zm_push:        SET B, [inst_argv]
 .endproc
 
 .proc
-zm_pop          SET A, 0
+zm_pop:         SET A, 0
                 JSR read_var
                 SET B, A
                 SET A, [inst_argv]
