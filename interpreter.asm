@@ -121,6 +121,8 @@ _arg_loop:      IFA I, 0                        ; Copy down (ignore routine addr
                 JMP _arg_loop
 
 _call_start:    JSR step_mach
+                SET A, [return_value]           ; Reserve return value
+                JSR write_var
                 POP [data_stack]
                 POP [local_var]
                 POP [even_flag]
