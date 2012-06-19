@@ -76,10 +76,11 @@ _short_op:      SET A, X
                 JMP [_1op_inst+X]
 
 ; --- Jump tables --------------------------
+.equ illegal 0
 _0op_inst:      .data 0             ; 0x00
                 .data 0             ; 0x01
-                .data 0             ; 0x02
-                .data 0             ; 0x03
+                .data zm_print      ; 0x02
+                .data zm_printret   ; 0x03
                 .data 0             ; 0x04
                 .data 0             ; 0x05
                 .data 0             ; 0x06
@@ -90,8 +91,8 @@ _0op_inst:      .data 0             ; 0x00
                 .data 0             ; 0x0B
                 .data 0             ; 0x0C
                 .data 0             ; 0x0D
-                .data 0             ; 0x0E *
-                .data 0             ; 0x0F *
+                .data illegal       ; 0x0E
+                .data illegal       ; 0x0F
 _1op_inst:      .data 0             ; 0x00
                 .data 0             ; 0x01
                 .data 0             ; 0x02
@@ -99,13 +100,13 @@ _1op_inst:      .data 0             ; 0x00
                 .data 0             ; 0x04
                 .data 0             ; 0x05
                 .data 0             ; 0x06
-                .data 0             ; 0x07
+                .data zm_printaddr  ; 0x07
                 .data zm_call       ; 0x08
                 .data 0             ; 0x09
                 .data 0             ; 0x0A
                 .data 0             ; 0x0B
                 .data 0             ; 0x0C
-                .data 0             ; 0x0D
+                .data zm_printpaddr ; 0x0D
                 .data 0             ; 0x0E
                 .data 0             ; 0x0F
 _2op_inst:      .data 0             ; 0x00
@@ -133,13 +134,13 @@ _2op_inst:      .data 0             ; 0x00
                 .data zm_mul        ; 0x16
                 .data zm_div        ; 0x17
                 .data zm_mod        ; 0x18
-                .data 0             ; 0x19 *
-                .data 0             ; 0x1A *
-                .data 0             ; 0x1B *
-                .data 0             ; 0x1C *
-                .data 0             ; 0x1D *
-                .data 0             ; 0x1E *
-                .data 0             ; 0x1F *
+                .data illegal       ; 0x19
+                .data illegal       ; 0x1A
+                .data illegal       ; 0x1B
+                .data illegal       ; 0x1C
+                .data illegal       ; 0x1D
+                .data illegal       ; 0x1E
+                .data illegal       ; 0x1F
 _var_inst:      .data zm_call       ; 0x00
                 .data zm_storew     ; 0x01
                 .data zm_storeb     ; 0x02
@@ -162,16 +163,16 @@ _var_inst:      .data zm_call       ; 0x00
                 .data 0             ; 0x13
                 .data 0             ; 0x14
                 .data 0             ; 0x15
-                .data 0             ; 0x16 *
-                .data 0             ; 0x17 *
-                .data 0             ; 0x18 *
-                .data 0             ; 0x19 *
-                .data 0             ; 0x1A *
-                .data 0             ; 0x1B *
-                .data 0             ; 0x1C *
-                .data 0             ; 0x1D *
-                .data 0             ; 0x1E *
-                .data 0             ; 0x1F *
+                .data illegal       ; 0x16
+                .data illegal       ; 0x17
+                .data illegal       ; 0x18
+                .data illegal       ; 0x19
+                .data illegal       ; 0x1A
+                .data illegal       ; 0x1B
+                .data illegal       ; 0x1C
+                .data illegal       ; 0x1D
+                .data illegal       ; 0x1E
+                .data illegal       ; 0x1F
 
 
 .endproc
@@ -294,6 +295,29 @@ zm_storeb:      SET A, [inst_argv+1]
                 SET B, [inst_argv+2]
                 JSR write_b_addr
                 JMP step_mach
+.endproc
+
+.proc
+zm_printaddr:   SET A, [inst_argv]
+                JSR print_addr
+                JMP step_mach
+.endproc
+
+.proc
+zm_printpaddr:  SET A, [inst_argv]
+                JSR print_paddr
+                JMP step_mach
+.endproc
+
+.proc
+zm_print:       JSR print_addr
+                JMP step_mach
+.endproc
+
+.proc
+zm_printret:    JSR print_addr
+                SET [return_value], 1   ; Return true
+                RET
 .endproc
 
 ; =========================================================

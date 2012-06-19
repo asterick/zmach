@@ -27,6 +27,14 @@ _alpha_dict1:    .data "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 _alpha_dict2:    .data " \r0123456789.,!?_#'\"/\\-:()"
 _alphabet:       .data _alpha_dict0
 
+print_addr:     PUSH [current_pc]
+                PUSH [even_flag]
+                JSR set_pc_addr
+                JSR print_zstring
+                POP [even_flag]
+                POP [current_pc]
+                RET
+
 print_paddr:    PUSH [current_pc]
                 PUSH [even_flag]
                 JSR set_pc_paddr
