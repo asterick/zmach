@@ -177,6 +177,45 @@ _var_inst:      .data zm_call       ; 0x00
 
 .endproc
 
+.proc
+zm_branch:      SET X, A            ; X = Condition
+                JSR read_b_pc
+
+                IFC A, 0x80
+                    JMP _no_invert
+                ; Invert Condition conditional
+                IFE X, 0
+                    SET X, 1
+                IFN X, 0
+                    SET X, 0
+                AND A, 0x7F
+
+_no_invert:     SET Y, A
+                AND Y, 0x3F
+                IFB A, 0x40
+                    JMP _single_byte
+
+                SHL Y, 8
+                IFB Y, 0x20
+                    BOR Y, 0xC0     ; Sign extend
+                JSR read_b_pc
+                BOR Y, A
+
+_single_byte:   IFN X, 0            ; No branch
+                    JMP step_mach
+                IFE Y, 0            ; Return false
+                    JMP zm_rfalse
+                IFE Y, 1            ; Return true
+                    JMP zm_rtrue
+                SUB Y, 2            ; Y = offset
+                
+                SHR Y, 1            ; Relative jump
+                ADD [even_flag], EX 
+                ADX [current_pc], Y
+                JMP step_mach
+
+.endproc
+
 ; =========================================================
 ; Preserve z-machine call frame, and restore with call
 ; =========================================================
