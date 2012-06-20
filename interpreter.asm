@@ -1,7 +1,3 @@
-; --- TOP OF DATA STACK
-; [variables 0...E]
-; [data stack]
-
 ; =========================================================
 ; Z-Machine entry point (operations table included)
 ; =========================================================
