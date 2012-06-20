@@ -111,7 +111,7 @@ _2op_inst:      .data illegal       ; 0x00
                 .data zm_jg         ; 0x03
                 .data zm_decchk     ; 0x04
                 .data zm_incchk     ; 0x05
-                .data 0             ; 0x06
+                .data zm_jin        ; 0x06
                 .data zm_test       ; 0x07
                 .data zm_or         ; 0x08
                 .data zm_and        ; 0x09
@@ -258,6 +258,19 @@ _call_start:    JSR step_mach
                 POP C
                 POP B
                 JMP step_mach
+.endproc
+
+.proc
+zm_jin:         SET A, [inst_argv+1]
+                JSR zm_objaddr
+                ADD A, 4            ; Parent
+                JSR read_b_addr
+                SET B, A
+                IFE B, [inst_argv]
+                    SET A, 1
+                IFN B, [inst_argb]
+                    SET A, 0
+                JMP zm_branch
 .endproc
 
 .proc
