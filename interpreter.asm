@@ -268,7 +268,7 @@ zm_jin:         SET A, [inst_argv+1]
                 SET B, A
                 IFE B, [inst_argv]
                     SET A, 1
-                IFN B, [inst_argb]
+                IFN B, [inst_argv]
                     SET A, 0
                 JMP zm_branch
 .endproc
