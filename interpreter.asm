@@ -110,9 +110,9 @@ _1op_inst:      .data 0             ; 0x00
                 .data zm_load       ; 0x0E
                 .data zm_not        ; 0x0F
 _2op_inst:      .data illegal       ; 0x00
-                .data 0             ; 0x01
-                .data 0             ; 0x02
-                .data 0             ; 0x03
+                .data zm_je         ; 0x01
+                .data zm_jl         ; 0x02
+                .data zm_jg         ; 0x03
                 .data 0             ; 0x04
                 .data 0             ; 0x05
                 .data 0             ; 0x06
@@ -254,6 +254,31 @@ _call_start:    JSR step_mach
                 POP C
                 POP B
                 JMP step_mach
+.endproc
+
+.proc
+zm_je:          SET I, 1
+                SET A, 0    ; Don't branch
+_check:         IFE I, [inst_argc]
+                IFG I, [inst_argc]
+                    JMP zm_branch
+                IFE [inst_argv], [inst_argv+I]
+                    SET A, 1
+                JMP _check
+.endproc
+
+.proc
+zm_jl:          SET A, 0
+                IFU [inst_argv], [inst_argv+1]
+                    SET A, 1
+                JMP zm_branch
+.endproc
+
+.proc
+zm_jg:          SET A, 0
+                IFA [inst_argv], [inst_argv+1]
+                    SET A, 1
+                JMP zm_branch
 .endproc
 
 .proc
