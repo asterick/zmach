@@ -89,10 +89,10 @@ _0op_inst:      .data zm_rtrue      ; 0x00
                 .data 0             ; 0x0D
                 .data illegal       ; 0x0E
                 .data illegal       ; 0x0F
-_1op_inst:      .data 0             ; 0x00
-                .data 0             ; 0x01
-                .data 0             ; 0x02
-                .data 0             ; 0x03
+_1op_inst:      .data zm_jz         ; 0x00
+                .data zm_getsibling ; 0x01
+                .data zm_getchild   ; 0x02
+                .data zm_getparent  ; 0x03
                 .data 0             ; 0x04
                 .data zm_inc        ; 0x05
                 .data zm_dec        ; 0x06
@@ -261,6 +261,44 @@ _call_start:    JSR step_mach
 .endproc
 
 .proc
+zm_getparent:   SET A, [inst_argv]
+                JSR zm_objaddr
+                ADD A, 4            ; Parent
+                JSR read_b_addr
+                SET X, A
+                JSR read_b_pc
+                SET B, X
+                JSR write_var
+                JMP step_mach
+.endproc
+
+.proc
+zm_getsibling:  SET A, [inst_argv]
+                JSR zm_objaddr
+                ADD A, 5            ; Sibling
+                JSR read_b_addr
+                SET X, A
+                JSR read_b_pc
+                SET B, X
+                JSR write_var
+                SET A, X
+                JMP zm_branch
+.endproc
+
+.proc
+zm_getchild:    SET A, [inst_argv]
+                JSR zm_objaddr
+                ADD A, 6            ; Child
+                JSR read_b_addr
+                SET X, A
+                JSR read_b_pc
+                SET B, X
+                JSR write_var
+                SET A, X
+                JMP zm_branch
+.endproc
+
+.proc
 zm_testattr:    SET A, [inst_argv]
                 JSR zm_objaddr
                 SET X, A                ; X = Object addr
@@ -361,6 +399,13 @@ zm_jl:          SET A, 0
 .proc
 zm_jg:          SET A, 0
                 IFA [inst_argv], [inst_argv+1]
+                    SET A, 1
+                JMP zm_branch
+.endproc
+
+.proc
+zm_jz:          SET A, 0
+                IFE [inst_argv], 0
                     SET A, 1
                 JMP zm_branch
 .endproc
