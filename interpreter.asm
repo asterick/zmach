@@ -105,7 +105,7 @@ _1op_inst:      .data 0             ; 0x00
                 .data 0             ; 0x09
                 .data 0             ; 0x0A
                 .data zm_ret        ; 0x0B
-                .data 0             ; 0x0C
+                .data zm_jump       ; 0x0C
                 .data zm_printpaddr ; 0x0D
                 .data zm_load       ; 0x0E
                 .data zm_not        ; 0x0F
@@ -253,6 +253,14 @@ _call_start:    JSR step_mach
                 POP [current_pc]
                 POP C
                 POP B
+                JMP step_mach
+.endproc
+
+.proc
+zm_jump:        SET A, [inst_argv]
+                ASR A, 1
+                ADD [even_flag], EX 
+                ADX [current_pc], A
                 JMP step_mach
 .endproc
 
