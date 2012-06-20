@@ -209,7 +209,7 @@ _single_byte:   IFN X, 0            ; No branch
                     JMP zm_rtrue
                 SUB Y, 2            ; Y = offset
                 
-                SHR Y, 1            ; Relative jump
+                ASR Y, 1            ; Relative jump
                 ADD [even_flag], EX 
                 ADX [current_pc], Y
                 JMP step_mach
