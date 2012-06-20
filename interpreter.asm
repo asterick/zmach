@@ -115,9 +115,9 @@ _2op_inst:      .data illegal       ; 0x00
                 .data zm_test       ; 0x07
                 .data zm_or         ; 0x08
                 .data zm_and        ; 0x09
-                .data 0             ; 0x0A
-                .data 0             ; 0x0B
-                .data 0             ; 0x0C
+                .data zm_testattr   ; 0x0A
+                .data zm_setattr    ; 0x0B
+                .data zm_clearattr  ; 0x0C
                 .data zm_store      ; 0x0D
                 .data 0             ; 0x0E
                 .data zm_loadw      ; 0x0F
@@ -257,6 +257,76 @@ _call_start:    JSR step_mach
                 POP [current_pc]
                 POP C
                 POP B
+                JMP step_mach
+.endproc
+
+.proc
+zm_testattr:    SET A, [inst_argv]
+                JSR zm_objaddr
+                SET X, A                ; X = Object addr
+                SET A, [inst_argv+1]
+                IFG A, 31
+                    JMP step_mach
+                SHR A, 3                ; EX = bit select
+                SET Y, EX
+                ADD X, A                ; X = Attribute byte
+                SHR Y, 13               
+                SET Z, 0x80             
+                SHR Z, Y                ; Z = Bit mask
+                
+                SET A, X                ; Read address and mask it
+                JSR read_b_addr
+                AND A, Z
+                
+                JMP zm_branch
+.endproc
+
+.proc
+zm_setattr:    SET A, [inst_argv]
+                JSR zm_objaddr
+                SET X, A                ; X = Object addr
+                SET A, [inst_argv+1]
+                IFG A, 31
+                    JMP step_mach
+                SHR A, 3                ; EX = bit select
+                SET Y, EX
+                ADD X, A                ; X = Attribute byte
+                SHR Y, 13               
+                SET Z, 0x80             
+                SHR Z, Y                ; Z = Bit mask
+                
+                SET A, X                ; Read address and mask it
+                JSR read_b_addr
+                BOR Z, A
+                SET B, Z
+                SET A, X
+                JSR write_b_addr
+                
+                JMP step_mach
+.endproc
+
+.proc
+zm_clearattr:   SET A, [inst_argv]
+                JSR zm_objaddr
+                SET X, A                ; X = Object addr
+                SET A, [inst_argv+1]
+                IFG A, 31
+                    JMP step_mach
+                SHR A, 3                ; EX = bit select
+                SET Y, EX
+                ADD X, A                ; X = Attribute byte
+                SHR Y, 13               
+                SET Z, 0x80             
+                SHR Z, Y                ; Z = Bit mask
+                XOR Z, 0xFF             ; Invert it
+                
+                SET A, X                ; Read address and mask it
+                JSR read_b_addr
+                AND Z, A
+                SET B, Z
+                SET A, X
+                JSR write_b_addr
+                
                 JMP step_mach
 .endproc
 
