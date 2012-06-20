@@ -78,9 +78,9 @@ _0op_inst:      .data zm_rtrue      ; 0x00
                 .data zm_print      ; 0x02
                 .data zm_printret   ; 0x03
                 .data step_mach     ; 0x04
-                .data 0             ; 0x05 * Will not implement
-                .data 0             ; 0x06 * Will not implement
-                .data 0             ; 0x07 * Will not implement
+                .data zm_save       ; 0x05
+                .data zm_restore    ; 0x06
+                .data zm_restart    ; 0x07
                 .data zm_retpop     ; 0x08
                 .data zm_voidpop    ; 0x09
                 .data zm_quit       ; 0x0A
@@ -156,9 +156,9 @@ _var_inst:      .data zm_call       ; 0x00
                 .data illegal       ; 0x10
                 .data illegal       ; 0x11
                 .data illegal       ; 0x12
-                .data 0             ; 0x13
-                .data 0             ; 0x14
-                .data 0             ; 0x15
+                .data zm_setout     ; 0x13
+                .data zm_setin      ; 0x14
+                .data zm_sfx        ; 0x15
                 .data illegal       ; 0x16
                 .data illegal       ; 0x17
                 .data illegal       ; 0x18
@@ -258,6 +258,32 @@ _call_start:    JSR step_mach
                 POP C
                 POP B
                 JMP step_mach
+.endproc
+
+.proc
+zm_save:        SET A, 0            ; Due to a lack of disk support, we don't handle this
+                JMP zm_branch
+.endproc
+
+.proc
+zm_restore:     SET A, 0            ; Due to a lack of disk support, we don't handle this
+                JMP zm_branch
+.endproc
+
+.proc
+zm_restart:     JMP zm_restart      ; Due to a lack of disk support, we don't handle this
+.endproc
+
+.proc
+zm_sfx:         JMP step_mach       ; This is a glorified NOP until notch adds audio
+.endproc
+
+.proc
+zm_setout:      JMP step_mach       ; We don't actually handle this
+.endproc
+
+.proc
+zm_setin:       JMP step_mach       ; We don't actually handle this
 .endproc
 
 .proc

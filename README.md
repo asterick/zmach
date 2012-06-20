@@ -25,7 +25,7 @@ Current implemented features
 Current task list
 -----------------
 * Interpreter core
-    * Current instruction coverage: 50 of 69 implemented
+    * Current instruction coverage: 56 of 69 implemented (6 stubbed)
     * Input tokenizer missing (used in sread)
 
 Things to be added in the future
