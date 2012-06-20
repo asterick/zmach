@@ -85,21 +85,21 @@ _0op_inst:      .data zm_rtrue      ; 0x00
                 .data zm_voidpop    ; 0x09
                 .data zm_quit       ; 0x0A
                 .data zm_newline    ; 0x0B
-                .data 0             ; 0x0C
-                .data 0             ; 0x0D
+                .data 0             ; 0x0C  show status
+                .data zm_verify     ; 0x0D
                 .data illegal       ; 0x0E
                 .data illegal       ; 0x0F
 _1op_inst:      .data zm_jz         ; 0x00
                 .data zm_getsibling ; 0x01
                 .data zm_getchild   ; 0x02
                 .data zm_getparent  ; 0x03
-                .data 0             ; 0x04
+                .data 0             ; 0x04  get prop len
                 .data zm_inc        ; 0x05
                 .data zm_dec        ; 0x06
                 .data zm_printaddr  ; 0x07
                 .data zm_call       ; 0x08
-                .data 0             ; 0x09
-                .data 0             ; 0x0A
+                .data 0             ; 0x09  remove object
+                .data zm_objaddr    ; 0x0A
                 .data zm_ret        ; 0x0B
                 .data zm_jump       ; 0x0C
                 .data zm_printpaddr ; 0x0D
@@ -119,12 +119,12 @@ _2op_inst:      .data illegal       ; 0x00
                 .data zm_setattr    ; 0x0B
                 .data zm_clearattr  ; 0x0C
                 .data zm_store      ; 0x0D
-                .data 0             ; 0x0E
+                .data 0             ; 0x0E  insert object
                 .data zm_loadw      ; 0x0F
                 .data zm_loadb      ; 0x10
-                .data 0             ; 0x11
-                .data 0             ; 0x12
-                .data 0             ; 0x13
+                .data 0             ; 0x11  get prop 
+                .data 0             ; 0x12  get prop addr
+                .data 0             ; 0x13  get next prop
                 .data zm_add        ; 0x14
                 .data zm_sub        ; 0x15
                 .data zm_mul        ; 0x16
@@ -140,15 +140,15 @@ _2op_inst:      .data illegal       ; 0x00
 _var_inst:      .data zm_call       ; 0x00
                 .data zm_storew     ; 0x01
                 .data zm_storeb     ; 0x02
-                .data 0             ; 0x03
-                .data 0             ; 0x04
+                .data 0             ; 0x03  put prop
+                .data 0             ; 0x04  sread
                 .data zm_printchar  ; 0x05
                 .data zm_printnum   ; 0x06
                 .data zm_random     ; 0x07
                 .data zm_push       ; 0x08
                 .data zm_pop        ; 0x09
-                .data 0             ; 0x0A
-                .data 0             ; 0x0B
+                .data 0             ; 0x0A  split lines (not needed)
+                .data 0             ; 0x0B  set window (not needed)
                 .data illegal       ; 0x0C
                 .data illegal       ; 0x0D
                 .data illegal       ; 0x0E
@@ -258,6 +258,21 @@ _call_start:    JSR step_mach
                 POP C
                 POP B
                 JMP step_mach
+.endproc
+
+.proc
+zm_printobj:    SET A, [inst_argv]
+                JMP zm_objaddr
+                ADD A, 7            ; Property address
+                JMP read_w_addr
+                ADD A, 2            ; String address
+                JSR print_addr
+                JMP step_mach
+.endproc
+
+.proc
+zm_verify:      SET A, 1            ; We assume the checksum is correct for now
+                JMP zm_branch
 .endproc
 
 .proc
