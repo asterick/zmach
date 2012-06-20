@@ -113,10 +113,10 @@ _2op_inst:      .data illegal       ; 0x00
                 .data zm_je         ; 0x01
                 .data zm_jl         ; 0x02
                 .data zm_jg         ; 0x03
-                .data 0             ; 0x04
-                .data 0             ; 0x05
+                .data zm_decchk     ; 0x04
+                .data zm_incchk     ; 0x05
                 .data 0             ; 0x06
-                .data 0             ; 0x07
+                .data zm_test       ; 0x07
                 .data zm_or         ; 0x08
                 .data zm_and        ; 0x09
                 .data 0             ; 0x0A
@@ -175,6 +175,14 @@ _var_inst:      .data zm_call       ; 0x00
                 .data illegal       ; 0x1F
 
 
+.endproc
+
+.proc
+zm_objaddr:     SUB A, 1
+                MUL A, 9
+                ADD A, 64
+                ADD A, [STORY_OBJ_TBL]
+                RET
 .endproc
 
 .proc
@@ -254,6 +262,16 @@ _call_start:    JSR step_mach
                 POP C
                 POP B
                 JMP step_mach
+.endproc
+
+.proc
+zm_test:        SET C, [inst_argv]
+                SET B, [inst_argv+1]
+                AND C, B
+                SET A, 0
+                IFE C, B
+                    SET A, 1
+                JMP zm_branch
 .endproc
 
 .proc
@@ -393,10 +411,36 @@ zm_inc:         SET A, [inst_argv]
 .endproc
 
 .proc
+zm_incchk:      SET A, [inst_argv]
+                JSR read_var
+                SET B, A
+                ADD B, 1
+                SET X, 0
+                IFA B, [inst_argv+1]
+                    SET X, 1
+                SET A, [inst_argv]
+                JSR write_var
+                JMP zm_branch
+.endproc
+
+.proc
 zm_dec:         SET A, [inst_argv]
                 JSR read_var
                 SET B, A
                 SUB B, 1
+                SET A, [inst_argv]
+                JSR write_var
+                JMP zm_branch
+.endproc
+
+.proc
+zm_decchk:      SET A, [inst_argv]
+                JSR read_var
+                SET B, A
+                SUB B, 1
+                SET X, 0
+                IFU B, [inst_argv+1]
+                    SET X, 1
                 SET A, [inst_argv]
                 JSR write_var
                 JMP step_mach
